@@ -31,7 +31,7 @@ jobs:
           pip install -r requirements.txt
           
       - name: Fetch articles using newspaper3k
-        run: python scripts/rules_for_clips.py
+        run: python scripts/rules_for_articles.py
 
       - name: Upload input.json
         uses: actions/upload-artifact@v4
@@ -48,7 +48,7 @@ jobs:
         run: npm install
 
       - name: Generate summary and Slack payloads
-        run: node scripts/generate_summary_revised.mjs data/input.json
+        run: node scripts/generate_summary.mjs data/input.json
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
