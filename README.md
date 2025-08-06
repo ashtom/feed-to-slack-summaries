@@ -17,8 +17,8 @@ This project automates the process of delivering high-quality tech and AI news s
 
 - **AI-Powered Summarization**  
   Uses OpenAI or other LLMs to generate:
-  - Why it Matters (A 25–50 word summary explaining the importance or relevance of this article)
-  - Highlight (An 80–110 word summary with key quotes, stats, or product details)
+  - **Why it Matters** (A 25–50 word summary explaining the importance or relevance of this article)
+  - **Highlight** (An 80–110 word summary with key quotes, stats, or product details)
 
 - **Slack Integration**  
   Sends the top 5 summaries to a Slack channel in a well-formatted thread.
@@ -27,51 +27,40 @@ This project automates the process of delivering high-quality tech and AI news s
   Keywords, scheduling, and sources can all be configured.
 
 ---
-
 ## 🛠️ Setup
-
-1. **Install Dependencies**
-
+Install Dependencies
 ```bash
 npm install
-Add Secrets (for GitHub Actions)
+```
+**Add Secrets (for GitHub Actions)**
+Go to your GitHub repo settings and add the following repository secrets:
+- **PAT_TOKEN** — your Personal Access Token (GitHub) or OpenAI key
+- **BOT_TOKEN** — for Slack API access
+- **CHANNEL_ID** — the ID of the target Slack channel
 
-Go to your GitHub repo settings and add:
+## Customize Keywords & Feeds
+Edit scripts/rules_for_articles.py to change the keyword filters or feed URLs to better match your use case.
 
-PAT_TOKEN — your Personal Access Token (PAT) / OpenAI token 
+## 🤖 How It Works
+- Fetches articles from RSS feeds
+- Filters them based on freshness and relevance
+- Uses OpenAI to generate summaries using a structured system prompt
+- Formats them with Slack Block Kit
+- Posts to Slack (parent message + threaded replies)
 
-BOT_TOKEN — for Slack API access
+## 📁 Output Files
+1. parent_payload.json — Slack message block with title
+2. thread_reply_payload.json — Slack blocks for each article (posted in a thread)
 
-CHANNEL_ID — target Slack channel
+These files are used by GitHub Actions to send the content to Slack.
 
-Customize Keywords & Feeds
-Edit the relevant sections in scripts/rules_for_articles.py to change keyword filters or feed URLs.
+## 📄 License
+MIT — feel free to use, modify, or extend this project for your own workflows.
 
-🤖 How It Works
-Fetches articles from RSS feeds.
-
-Filters articles based on freshness and keyword relevance.
-
-Generates summaries via OpenAI using a structured system prompt.
-
-Formats summaries into Slack Block Kit.
-
-Posts to Slack (parent message + threaded replies).
-
-📁 Output Files
-parent_payload.json — Slack message with title
-
-thread_reply_payload.json — Slack blocks for each article to post inside a thread
-
-These are used by GitHub Actions to send content to Slack.
-
-📄 License
-MIT — feel free to use, modify, or extend this project for your own use cases.
-
-🙌 Contributing
+## 🙌 Contributing
 Pull requests are welcome! Feel free to open issues or suggest improvements.
 
-🌐 Example Use Cases
+## 🌐 Example Use Cases
 Team-wide daily news digests
 
 Executive summaries on AI product launches
