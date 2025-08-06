@@ -1,0 +1,82 @@
+name: Daily Feed Clips to Slack Summaries
+
+on:
+  schedule:
+    - cron: '0 16 * * 1-5'  # Change Time as Needed (currently set at 9AM PST Mon-Fri)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  post-summaries-to-slack:
+    runs-on: ubuntu-latest
+    
+    env:
+      BOT_TOKEN: ${{secrets.BOT_TOKEN }} // ADD YOUR SLACK BOT TOKEN HERE
+      CHANNEL_ID: ${{secrets.CHANNEL_ID }} // ADD YOUR SLACK CHANNEL ID HERE
+      PAT: ${{secrets.PAT_TOKEN }} // ADD YOUR PERSONAL ACCESS TOKEN HERE
+
+    steps:    
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+          
+      - name: Fetch articles using newspaper3k
+        run: python scripts/rules_for_clips.py
+
+      - name: Upload input.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: input-json
+          path: data/input.json
+   
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Generate summary and Slack payloads
+        run: node scripts/generate_summary_revised.mjs data/input.json
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Send parent Slack message
+        id: post_parent
+        run: |
+          response=$(curl -s -X POST \
+            -H "Authorization: Bearer $BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @parent_payload.json \
+            https://slack.com/api/chat.postMessage)
+          echo "Slack API response: $response"
+          ok=$(echo "$response" | jq -r '.ok')
+          if [ "$ok" != "true" ]; then
+            echo "Slack API error:"
+            echo "$response"
+            exit 1
+          fi
+          ts=$(echo "$response" | jq -r '.ts')
+          echo "thread_ts=$ts" >> $OUTPUT
+          
+      - name: Send thread reply
+        run: |
+          jq --arg ts "${{ steps.post_parent.outputs.thread_ts }}" \
+            '. + {thread_ts: $ts}' thread_reply_payload.json > thread_with_ts.json
+          curl -X POST \
+            -H "Authorization: Bearer $BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @thread_with_ts.json \
+            https://slack.com/api/chat.postMessage
