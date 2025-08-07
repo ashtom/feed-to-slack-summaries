@@ -1,9 +1,7 @@
 name: Daily Feed Clips to Slack Summaries
 
 on:
-  schedule:
-    - cron: '0 16 * * 1-5'  # Change Time as Needed (currently set at 9AM PST Mon-Fri)
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger only (change to schedule if want auto trigger)
 
 permissions:
   contents: read
