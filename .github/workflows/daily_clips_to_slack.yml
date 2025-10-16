@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      BOT_TOKEN: ${{secrets.BOT_TOKEN }} // ADD YOUR SLACK BOT TOKEN HERE
-      CHANNEL_ID: ${{secrets.CHANNEL_ID }} // ADD YOUR SLACK CHANNEL ID HERE
-      GITHUB_TOKEN: ${{secrets.PAT_TOKEN }} // ADD YOUR PERSONAL ACCESS TOKEN HERE
+      BOT_TOKEN: ${{secrets.BOT_TOKEN }}
+      CHANNEL_ID: ${{secrets.CHANNEL_ID }}
+      GITHUB_TOKEN: ${{secrets.PAT_TOKEN }}
 
     steps:    
       - name: Checkout repo
