@@ -67,7 +67,7 @@ jobs:
             exit 1
           fi
           ts=$(echo "$response" | jq -r '.ts')
-          jq --arg ts "${{ steps.post_parent.outputs.thread_ts }}" \
+          jq --arg ts "$ts" \
             '. + {thread_ts: $ts}' thread_reply_payload.json > thread_with_ts.json
           curl -X POST \
             -H "Authorization: Bearer $BOT_TOKEN" \
