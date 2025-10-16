@@ -12,7 +12,8 @@ export async function makeCompletion(systemPrompt, prompt) {
     throw new Error("Missing PAT_TOKEN");
   }
 
-  core.info("Token: " + token.slice(0, 4) + "...");
+  core.info("Token Start: " + token.slice(0, 4) + "...");
+  core.info("Token End: " + "..." + token.slice(-4));
 
   const client = new OpenAI({ baseURL: endpoint, apiKey: token.replace(/^\s+|\s+$/g, '') });
 
