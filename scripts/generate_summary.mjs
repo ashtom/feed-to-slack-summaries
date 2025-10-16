@@ -130,16 +130,16 @@ async function main() {
     }
   }
 
-  const allBlocks = summaries.flatMap(item => createSlackBlock(item));
-  const slackTitle = `📰 *Daily Top 5 – ${today}* 📰`;
-
   const today = new Date().toLocaleDateString("en-US", {
     month: "long", day: "numeric", year: "numeric"
   });
 
+  const allBlocks = summaries.flatMap(item => createSlackBlock(item));
+  const slackTitle = `📰 *Daily Top 5 – ${today}* 📰`;
+
   const threadReplyPayload = {
     channel: process.env.CHANNEL_ID,
-    text: slackTitle
+    text: slackTitle,
     blocks: allBlocks,
     unfurl_links: false,
     unfurl_media: false
