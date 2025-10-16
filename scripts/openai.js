@@ -12,7 +12,7 @@ export async function makeCompletion(systemPrompt, prompt) {
     throw new Error("Missing PAT_TOKEN");
   }
 
-  const client = new OpenAI({ baseURL: endpoint, apiKey: token });
+  const client = new OpenAI({ baseURL: endpoint, apiKey: token.replace(/^\s+|\s+$/g, '') });
 
   const response = await client.chat.completions.create({
     model: modelName,
