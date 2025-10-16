@@ -14,6 +14,7 @@ jobs:
       BOT_TOKEN: ${{secrets.BOT_TOKEN }} // ADD YOUR SLACK BOT TOKEN HERE
       CHANNEL_ID: ${{secrets.CHANNEL_ID }} // ADD YOUR SLACK CHANNEL ID HERE
       PAT_TOKEN: ${{secrets.PAT_TOKEN }} // ADD YOUR PERSONAL ACCESS TOKEN HERE
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN }}
 
     steps:    
       - name: Checkout repo

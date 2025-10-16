@@ -2,7 +2,7 @@
 import OpenAI from "openai";
 import core from "@actions/core";
 
-const token = process.env["PAT_TOKEN"]; // REFERENCE ENV FROM WORKFLOW
+const token = process.env["GITHUB_TOKEN"]; // REFERENCE ENV FROM WORKFLOW
 const endpoint = "https://models.inference.ai.azure.com";
 const modelName = "gpt-4o"; // CHANGE OPENAI MODEL AS YOU SEE GIT
 
