@@ -22,6 +22,34 @@ PUBLICATIONS = [
     "Reuters", "NPR", "The Information"
 ]
 
+PUBLICATION_DOMAINS = {
+    "TechCrunch": ["techcrunch.com"],
+    "Axios": ["axios.com"],
+    "InformationWeek": ["informationweek.com", "feeds.feedburner.com"],
+    "Time": ["time.com"],
+    "SiliconANGLE": ["siliconangle.com"],
+    "CNBC": ["cnbc.com"],
+    "Quartz": ["qz.com"],
+    "Wall Street Journal": ["wsj.com"],
+    "Eurasianet": ["eurasianet.org"],
+    "Fortune": ["fortune.com"],
+    "New York Times": ["nytimes.com"],
+    "CBS News": ["cbsnews.com"],
+    "Politico": ["politico.com"],
+    "Wired": ["wired.com"],
+    "VentureBeat": ["venturebeat.com"],
+    "Bloomberg": ["bloomberg.com"],
+    "The Guardian": ["theguardian.com"],
+    "BBC": ["bbc.co.uk", "bbc.com"],
+    "Deadline": ["deadline.com"],
+    "The Atlantic": ["theatlantic.com"],
+    "The Verge": ["theverge.com"],
+    "Vulture": ["vulture.com"],
+    "Reuters": ["reuters.com"],
+    "NPR": ["npr.org"],
+    "The Information": ["theinformation.com"]
+}
+
 # Update RSS Feeds as you see fit
 RSS_FEEDS = [
     "https://techcrunch.com/feed/",
@@ -70,7 +98,6 @@ def deduplicate_articles(articles):
 
 # Currently set for 24 hours time window 
 def fetch_articles(time_window_hours=24):
-    seen_sources = set()
     articles = []
     now = datetime.utcnow()
     since = now - timedelta(hours=time_window_hours)
@@ -100,8 +127,15 @@ def fetch_articles(time_window_hours=24):
                 continue
 
             source = url.split("//")[-1].split("/")[0].replace("www.", "")
-            if not any(pub.lower() in source.lower() for pub in PUBLICATIONS):
-                continue
+            is_known_publication = any(pub.lower() in source.lower() for pub in PUBLICATIONS)
+            if not is_known_publication:
+                matched_domains = {
+                    pub: domains
+                    for pub, domains in PUBLICATION_DOMAINS.items()
+                    if any(domain in source.lower() for domain in domains)
+                }
+                if not matched_domains:
+                    continue
 
             try:
                 article_obj = Article(link)
@@ -123,13 +157,11 @@ def fetch_articles(time_window_hours=24):
                 "published": pub_date.isoformat()
             })
 
-            seen_sources.add(source)
-
             if len(articles) >= 20:
                 break  # Exit inner loop over feed entries
 
-        if len(articles) >= 20:
-            break  # Exit outer loop over feeds
+        #if len(articles) >= 20:
+        #    break  # Exit outer loop over feeds
 
     articles = deduplicate_articles(articles)
     print(f"🔎 Deduplicated to {len(articles)} articles")
@@ -139,9 +171,10 @@ def fetch_articles(time_window_hours=24):
         title = article["title"].lower()
         content = article["content"].lower()
 
-        source_bonus = 3 if article["source"] in [
-            "techcrunch.com", "cnbc.com", "axios.com", "siliconangle.com", "venturebeat.com"
-        ] else 0
+        # source_bonus = 3 if article["source"] in [
+        #     "techcrunch.com", "cnbc.com", "axios.com", "siliconangle.com", "venturebeat.com"
+        # ] else 0
+        source_bonus = 0
 
         launch_keywords = ["launch", "rolls out", "announces", "introduces", "unveils", "update", "beta", "developer preview", "API", "version", "preview"]
         ai_entities = ["openai", "github", "gemini", "copilot", "gpt", "anthropic", "claude", "cursor", "microsoft", "xai", "perplexity", "deepmind", "hugging face", "rag"]
@@ -158,7 +191,16 @@ def fetch_articles(time_window_hours=24):
         return score
 
     articles.sort(key=score_article, reverse=True)
-    final_articles = articles[:15]  # Give generate_summary room to retry
+    final_articles = []
+    source_counts = {}
+    for article in articles:
+        count = source_counts.get(article["source"], 0)
+        if count >= 2:
+            continue
+        final_articles.append(article)
+        source_counts[article["source"]] = count + 1
+        if len(final_articles) >= 15:
+            break
     return final_articles
 
 # Set currently for 5 articles; expands to 36 hour time window if less than 5 articles are found
