@@ -1,13 +1,15 @@
 import fs from 'fs';
-import { WebClient } from '@slack/web-api';
 import core from '@actions/core';
+
+const args = process.argv.slice(2);
+const dryRun = args.includes("--dry-run");
+const payloadPath = args.find(arg => !arg.startsWith("--")) || "thread_reply_payload.json";
 
 const token = process.env.BOT_TOKEN; // REFERENCE WORKFLOW FILE FOR NAME OF ENV
 const channel = process.env.CHANNEL_ID; // REFERENCE WORKFLOW FILE FOR NAME OF ENV
 const thread_ts = process.env.SLACK_THREAD_TS;
-const payloadPath = "thread_reply_payload.json";
 
-if (!token || !channel || !thread_ts) {
+if (!dryRun && (!token || !channel || !thread_ts)) {
   core.setFailed("Missing one or more required environment variables: BOT_TOKEN, CHANNEL_ID, SLACK_THREAD_TS");
   process.exit(1);
 }
@@ -20,6 +22,22 @@ try {
   process.exit(1);
 }
 
+if (dryRun) {
+  core.info(`Dry run: printing ${payloadPath}`);
+  if (payload.text) {
+    core.info(`Title: ${payload.text}`);
+  }
+  if (Array.isArray(payload.blocks)) {
+    payload.blocks
+      .filter(block => block.type === "section" && block.text?.text)
+      .forEach((block, index) => {
+        core.info(`Block ${index + 1}: ${block.text.text}`);
+      });
+  }
+  process.exit(0);
+}
+
+const { WebClient } = await import('@slack/web-api');
 const slack = new WebClient(token);
 
 async function postToSlack() {

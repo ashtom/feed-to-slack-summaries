@@ -8,8 +8,8 @@ const modelName = "gpt-4o"; // CHANGE OPENAI MODEL AS YOU SEE GIT
 
 export async function makeCompletion(systemPrompt, prompt) {
   if (!token) {
-    core.setFailed("PAT_TOKEN is missing.");
-    throw new Error("Missing PAT_TOKEN");
+    core.setFailed("GITHUB_TOKEN is missing (set from PAT_TOKEN in workflow). ");
+    throw new Error("Missing GITHUB_TOKEN");
   }
 
   const client = new OpenAI({ baseURL: endpoint, apiKey: token.replace(/^\s+|\s+$/g, '') });
