@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import core from '@actions/core';
+import * as core from '@actions/core';
 import { makeCompletion } from './openai.js';
 import { formatNewsPrompt } from './prompt.js';
 
