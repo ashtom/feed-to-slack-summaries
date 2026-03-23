@@ -1,6 +1,6 @@
 // Example code from github.com/models
 import OpenAI from "openai";
-import core from "@actions/core";
+import * as core from "@actions/core";
 
 const token = process.env["GITHUB_TOKEN"]; // REFERENCE ENV FROM WORKFLOW
 const endpoint = "https://models.inference.ai.azure.com";
