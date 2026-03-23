@@ -20,10 +20,10 @@ jobs:
 
     steps:    
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           
@@ -35,13 +35,13 @@ jobs:
         run: python scripts/rules_for_articles.py
 
       - name: Upload input.json
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: input-json
           path: data/input.json
    
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
       
