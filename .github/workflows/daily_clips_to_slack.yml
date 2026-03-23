@@ -11,8 +11,9 @@ permissions:
 jobs:
   post-summaries-to-slack:
     runs-on: ubuntu-latest
-    
+
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       BOT_TOKEN: ${{secrets.BOT_TOKEN }}
       CHANNEL_ID: ${{secrets.CHANNEL_ID }}
       GITHUB_TOKEN: ${{secrets.PAT_TOKEN }}
