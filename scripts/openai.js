@@ -4,7 +4,7 @@ import * as core from "@actions/core";
 
 const token = process.env["GITHUB_TOKEN"]; // REFERENCE ENV FROM WORKFLOW
 const endpoint = "https://models.github.ai/inference";
-const modelName = "openai/gpt-5-mini"; // CHANGE OPENAI MODEL AS YOU SEE GIT
+const modelName = "openai/gpt-4.1"; // CHANGE OPENAI MODEL AS YOU SEE GIT
 
 export async function makeCompletion(systemPrompt, prompt) {
   if (!token) {
