@@ -52,3 +52,6 @@ data/
 debug_failed_*.json
 *_payload.json
 thread_*.json
+
+# transient failure marker written by generate_summary.mjs
+summary_failed

@@ -134,16 +134,35 @@ async function main() {
     month: "long", day: "numeric", year: "numeric"
   });
 
-  const allBlocks = summaries.flatMap(item => createSlackBlock(item));
   const slackTitle = `📰 *Daily Top 5 – ${today}* 📰`;
 
-  const threadReplyPayload = {
-    channel: process.env.CHANNEL_ID,
-    text: slackTitle,
-    blocks: allBlocks,
-    unfurl_links: false,
-    unfurl_media: false
-  };
+  let threadReplyPayload;
+  if (summaries.length === 0) {
+    // Loud failure: instead of silently posting a bare headline, post a visible
+    // error into the thread and drop a marker so the workflow can fail the run.
+    const errorText =
+      `:warning: *Daily Top 5 failed for ${today}* — no article summaries were generated.\n` +
+      `Loaded ${articles.length} candidate article(s) but every summarization call failed. ` +
+      `Check the GitHub Actions logs (GitHub Models endpoint / token).`;
+    core.error("No summaries were generated — posting an error message to the Slack thread.");
+    threadReplyPayload = {
+      channel: process.env.CHANNEL_ID,
+      text: errorText,
+      blocks: [{ type: "section", text: { type: "mrkdwn", text: errorText } }],
+      unfurl_links: false,
+      unfurl_media: false
+    };
+    fs.writeFileSync("summary_failed", "1");
+  } else {
+    const allBlocks = summaries.flatMap(item => createSlackBlock(item));
+    threadReplyPayload = {
+      channel: process.env.CHANNEL_ID,
+      text: slackTitle,
+      blocks: allBlocks,
+      unfurl_links: false,
+      unfurl_media: false
+    };
+  }
 
   const parentPayload = {
     channel: process.env.CHANNEL_ID,

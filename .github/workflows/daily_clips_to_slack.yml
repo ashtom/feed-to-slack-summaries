@@ -77,3 +77,10 @@ jobs:
             -H "Content-Type: application/json" \
             --data @thread_with_ts.json \
             https://slack.com/api/chat.postMessage
+
+      - name: Fail run if no summaries were generated
+        run: |
+          if [ -f summary_failed ]; then
+            echo "::error::No article summaries were generated — an error message was posted to the Slack thread."
+            exit 1
+          fi
